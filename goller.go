@@ -1,8 +1,6 @@
 package goller
 
 import (
-	"log"
-
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -18,9 +16,15 @@ type SqsQueue struct {
 	handler Handler
 }
 
+//Logger interface for logger requirements
+type Logger interface {
+	Printf(format string, v ...interface{})
+	Fatal(v ...interface{})
+}
+
 //CustomLogger Wraps the logger to not print polling messages
 type CustomLogger struct {
-	logger *log.Logger
+	logger Logger
 }
 
 //Printf log.logger Printf wrapper to remove polling message
