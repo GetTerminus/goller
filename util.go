@@ -1,7 +1,7 @@
 package goller
 
-func checkErr(e error, l *CustomLogger) {
+func checkErr(e error, l Logger) {
 	if e != nil {
-		l.Logger.Fatal(e)
+		l.Fatal(e)
 	}
 }

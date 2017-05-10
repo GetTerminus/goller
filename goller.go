@@ -11,7 +11,7 @@ import (
 // SqsQueue is the structure containing config and session information for a particular poller
 type SqsQueue struct {
 	client  *sqs.SQS
-	logger  *CustomLogger
+	logger  Logger
 	config  Configuration
 	handler Handler
 }
@@ -20,6 +20,13 @@ type SqsQueue struct {
 type Logger interface {
 	Printf(format string, v ...interface{})
 	Fatal(v ...interface{})
+}
+
+//NewPollingSilencerLogger logger that removes the polling printing
+func NewPollingSilencerLogger(l Logger) *CustomLogger {
+	return &CustomLogger{
+		Logger: l,
+	}
 }
 
 //CustomLogger Wraps the logger to not print polling messages
@@ -41,7 +48,7 @@ func (l *CustomLogger) Fatal(v ...interface{}) {
 }
 
 // NewSqsPoller returns a new sqs poller for a given configuration and handler
-func NewSqsPoller(c Configuration, h Handler, l *CustomLogger) *SqsQueue {
+func NewSqsPoller(c Configuration, h Handler, l Logger) *SqsQueue {
 	mergeWithDefaultConfig(&c)
 
 	sess := getSession(&c, l)
@@ -90,7 +97,7 @@ func (s *SqsQueue) deleteMessage(receipt *string) {
 }
 
 // Gets the session based on the configuration: checks if credentials are set, otherwise, uses aws provider chain
-func getSession(c *Configuration, l *CustomLogger) *session.Session {
+func getSession(c *Configuration, l Logger) *session.Session {
 	var sess *session.Session
 	var err error
 
