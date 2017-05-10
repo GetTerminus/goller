@@ -61,7 +61,7 @@ var l *CustomLogger
 
 func init() {
 	l = &CustomLogger{
-		logger: log.New(os.Stdout, "goller: ", log.Lshortfile|log.LstdFlags),
+		Logger: log.New(os.Stdout, "goller: ", log.Lshortfile|log.LstdFlags),
 	}
 }
 

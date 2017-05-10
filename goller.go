@@ -24,7 +24,7 @@ type Logger interface {
 
 //CustomLogger Wraps the logger to not print polling messages
 type CustomLogger struct {
-	logger Logger
+	Logger Logger
 }
 
 //Printf log.logger Printf wrapper to remove polling message
@@ -32,12 +32,12 @@ func (l *CustomLogger) Printf(format string, v ...interface{}) {
 	if strings.Contains(format, "Finished long polling") || strings.Contains(format, "Long polling") {
 		return
 	}
-	l.logger.Printf(format, v)
+	l.Logger.Printf(format, v)
 }
 
 //Fatal log.logger Fatal wrapper
 func (l *CustomLogger) Fatal(v ...interface{}) {
-	l.logger.Fatal(v)
+	l.Logger.Fatal(v)
 }
 
 // NewSqsPoller returns a new sqs poller for a given configuration and handler
