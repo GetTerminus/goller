@@ -57,10 +57,12 @@ func (d *dummyHandler) Handle(message *string) {
 	fmt.Printf("%+v\n", *message)
 }
 
-var l *log.Logger
+var l *CustomLogger
 
 func init() {
-	l = log.New(os.Stdout, "goller: ", log.Lshortfile|log.LstdFlags)
+	l = &CustomLogger{
+		logger: log.New(os.Stdout, "goller: ", log.Lshortfile|log.LstdFlags),
+	}
 }
 
 func TestNewSqsPoller_WithoutCredentials(t *testing.T) {
