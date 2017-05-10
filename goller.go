@@ -62,7 +62,6 @@ func (s *SqsQueue) Poll() {
 		panic("A message handler needs to be registered first!")
 	}
 
-	s.logger.Printf("test long poll %s", "test")
 	s.logger.Printf("Long polling on %s\n", s.config.QueueURL)
 
 	params := &sqs.ReceiveMessageInput{
