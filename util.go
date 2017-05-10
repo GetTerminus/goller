@@ -1,8 +1,6 @@
 package goller
 
-import "log"
-
-func checkErr(e error, l *log.Logger) {
+func checkErr(e error, l Logger) {
 	if e != nil {
 		l.Fatal(e)
 	}

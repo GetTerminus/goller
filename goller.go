@@ -1,7 +1,7 @@
 package goller
 
 import (
-	"log"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -11,13 +11,44 @@ import (
 // SqsQueue is the structure containing config and session information for a particular poller
 type SqsQueue struct {
 	client  *sqs.SQS
-	logger  *log.Logger
+	logger  Logger
 	config  Configuration
 	handler Handler
 }
 
+//Logger interface for logger requirements
+type Logger interface {
+	Printf(format string, v ...interface{})
+	Fatal(v ...interface{})
+}
+
+//NewPollingSilencerLogger logger that removes the polling printing
+func NewPollingSilencerLogger(l Logger) *CustomLogger {
+	return &CustomLogger{
+		Logger: l,
+	}
+}
+
+//CustomLogger Wraps the logger to not print polling messages
+type CustomLogger struct {
+	Logger Logger
+}
+
+//Printf log.logger Printf wrapper to remove polling message
+func (l *CustomLogger) Printf(format string, v ...interface{}) {
+	if strings.Contains(format, "Finished long polling") || strings.Contains(format, "Long polling") {
+		return
+	}
+	l.Logger.Printf(format, v)
+}
+
+//Fatal log.logger Fatal wrapper
+func (l *CustomLogger) Fatal(v ...interface{}) {
+	l.Logger.Fatal(v)
+}
+
 // NewSqsPoller returns a new sqs poller for a given configuration and handler
-func NewSqsPoller(c Configuration, h Handler, l *log.Logger) *SqsQueue {
+func NewSqsPoller(c Configuration, h Handler, l Logger) *SqsQueue {
 	mergeWithDefaultConfig(&c)
 
 	sess := getSession(&c, l)
@@ -31,6 +62,7 @@ func (s *SqsQueue) Poll() {
 		panic("A message handler needs to be registered first!")
 	}
 
+	s.logger.Printf("test long poll %s", "test")
 	s.logger.Printf("Long polling on %s\n", s.config.QueueURL)
 
 	params := &sqs.ReceiveMessageInput{
@@ -65,7 +97,7 @@ func (s *SqsQueue) deleteMessage(receipt *string) {
 }
 
 // Gets the session based on the configuration: checks if credentials are set, otherwise, uses aws provider chain
-func getSession(c *Configuration, l *log.Logger) *session.Session {
+func getSession(c *Configuration, l Logger) *session.Session {
 	var sess *session.Session
 	var err error
 

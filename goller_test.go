@@ -57,10 +57,10 @@ func (d *dummyHandler) Handle(message *string) {
 	fmt.Printf("%+v\n", *message)
 }
 
-var l *log.Logger
+var l Logger
 
 func init() {
-	l = log.New(os.Stdout, "goller: ", log.Lshortfile|log.LstdFlags)
+	l = NewPollingSilencerLogger(log.New(os.Stdout, "goller: ", log.Lshortfile|log.LstdFlags))
 }
 
 func TestNewSqsPoller_WithoutCredentials(t *testing.T) {
